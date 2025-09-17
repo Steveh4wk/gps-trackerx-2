@@ -23,9 +23,10 @@ plyer==2.1.0
 # Web Framework (for web interface)
 flask==2.3.3
 flask-socketio==5.3.6
+gunicorn==21.2.0
 
 # Database
-sqlite3
+# sqlite3 is built into Python
 
 # Testing
 pytest==7.4.2

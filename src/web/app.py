@@ -4,6 +4,7 @@ Web Application for GPS Danger Zone Tracker
 Provides a web interface for monitoring and managing the GPS tracker.
 """
 
+import os
 from flask import Flask, render_template, jsonify, request
 from flask_socketio import SocketIO
 from typing import Dict, Any
@@ -19,7 +20,9 @@ def create_web_app(config: Dict[str, Any]) -> Flask:
         Configured Flask application
     """
     app = Flask(__name__)
-    app.config['SECRET_KEY'] = 'gps_tracker_secret_key'
+    # Use secret key from config or environment
+    secret_key = config.get('web_interface', {}).get('secret_key') or os.getenv('WEB_SECRET_KEY', 'gps_tracker_secret_key')
+    app.config['SECRET_KEY'] = secret_key
     
     # Initialize SocketIO for real-time updates
     socketio = SocketIO(app, cors_allowed_origins="*")
