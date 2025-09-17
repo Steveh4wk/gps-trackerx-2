@@ -1,0 +1,64 @@
+{
+  "app": {
+    "name": "GPS Danger Zone Tracker",
+    "version": "1.0.0",
+    "debug": false,
+    "log_level": "INFO"
+  },
+  "gps": {
+    "source_type": "serial",
+    "serial_port": "COM3",
+    "baud_rate": 9600,
+    "timeout": 1,
+    "update_interval": 1.0,
+    "backup_sources": ["file", "api"]
+  },
+  "zones": {
+    "check_interval": 5.0,
+    "buffer_distance": 10.0,
+    "units": "meters",
+    "default_radius": 100.0
+  },
+  "alerts": {
+    "enabled": true,
+    "types": ["desktop", "sound", "email"],
+    "sound_file": "alerts/warning.wav",
+    "email": {
+      "enabled": false,
+      "smtp_server": "smtp.gmail.com",
+      "smtp_port": 587,
+      "username": "",
+      "password": "",
+      "recipients": []
+    },
+    "cooldown_period": 60
+  },
+  "database": {
+    "type": "sqlite",
+    "path": "data/tracker.db",
+    "backup_interval": 3600
+  },
+  "web_interface": {
+    "enabled": true,
+    "host": "localhost",
+    "port": 5000,
+    "auto_open_browser": true
+  },
+  "mapping": {
+    "default_zoom": 15,
+    "tile_source": "OpenStreetMap",
+    "cache_tiles": true,
+    "offline_mode": false
+  },
+  "logging": {
+    "file": "logs/gps_tracker.log",
+    "max_size_mb": 10,
+    "backup_count": 5,
+    "format": "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+  },
+  "privacy": {
+    "store_location_history": true,
+    "data_retention_days": 30,
+    "anonymous_mode": false
+  }
+}

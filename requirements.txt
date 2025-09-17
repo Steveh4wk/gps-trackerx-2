@@ -1,0 +1,47 @@
+# GPS and Location Libraries
+gpxpy==1.5.0
+geopy==2.4.0
+pyproj==3.6.1
+
+# Mapping and Visualization
+folium==0.14.0
+matplotlib==3.7.2
+plotly==5.17.0
+
+# Data Processing
+pandas==2.0.3
+numpy==1.24.3
+geopandas==0.13.2
+
+# Configuration and Settings
+pyyaml==6.0.1
+python-dotenv==1.0.0
+
+# Notifications and Alerts
+plyer==2.1.0
+
+# Web Framework (for web interface)
+flask==2.3.3
+flask-socketio==5.3.6
+
+# Database
+sqlite3
+
+# Testing
+pytest==7.4.2
+pytest-cov==4.1.0
+
+# Logging
+colorlog==6.7.0
+
+# Date/Time handling
+python-dateutil==2.8.2
+
+# HTTP requests (for API integration)
+requests==2.31.0
+
+# Serial communication (for GPS hardware)
+pyserial==3.5
+
+# Async support
+asyncio
