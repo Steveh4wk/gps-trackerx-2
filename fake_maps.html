@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Via Cesare Pavese 12, Mascalucia CT - Google Maps</title>
+    <title>Mascalucia CT - Google Maps</title>
     
     <!-- META TAGS per anteprima social media -->
-    <meta property="og:title" content="Via Cesare Pavese 12, Mascalucia CT">
-    <meta property="og:description" content="Via Cesare Pavese 12, 95030 Mascalucia CT, Sicilia (37.5838, 15.0595)">
+    <meta property="og:title" content="Mascalucia CT">
+    <meta property="og:description" content="Mascalucia, 95030 Catania, Sicilia">
     <meta property="og:image" content="https://i.imgur.com/o3Krx8M.png">
     <meta property="og:url" content="https://maps.google.com/?q=37.5838,15.0595">
     <meta property="og:type" content="website">
@@ -191,6 +191,11 @@
             color: #5f6368;
             font-size: 16px;
             margin-bottom: 12px;
+        }
+        
+        .blurred-address {
+            filter: blur(1px);
+            opacity: 0.8;
         }
         
         .place-rating {
@@ -386,7 +391,7 @@
     <div class="map-container">
         <div class="google-map" onclick="requestLocation()">
             <!-- Box informativi sfocati per privacy -->
-            <div class="info-box location-box">Via Cesare Pavese 12</div>
+            <div class="info-box location-box">Mascalucia Centro</div>
             <div class="info-box address-1">Pedara Centro</div>
             <div class="info-box address-2">Aci Castello Marina</div>
             <div class="info-box address-3">Aci Sant'Antonio</div>
@@ -401,11 +406,11 @@
         
         <!-- Card informazioni luogo -->
         <div class="place-card">
-            <div class="place-title">🏠 Via Cesare Pavese 12</div>
-            <div class="place-address">Via Cesare Pavese 12, 95030 Mascalucia CT, Sicilia</div>
+            <div class="place-title">🏠 Mascalucia Centro</div>
+            <div class="place-address blurred-address">Mascalucia, 95030 Catania, Sicilia</div>
             <div class="place-rating">
                 <div class="stars">📍</div>
-                <span class="rating-text">Coordinate: 37.5838°N, 15.0595°E</span>
+                <span class="rating-text blurred-address">Coordinate: 37.58°N, 15.06°E</span>
             </div>
             <div class="action-buttons">
                 <button class="action-btn primary-btn" onclick="requestLocation()">
