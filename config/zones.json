@@ -1,0 +1,108 @@
+{
+  "danger_zones": [
+    {
+      "id": "zone_001",
+      "name": "Construction Site Alpha",
+      "description": "Active construction zone with heavy machinery",
+      "type": "construction",
+      "geometry": {
+        "type": "circle",
+        "center": {
+          "latitude": 40.7128,
+          "longitude": -74.0060
+        },
+        "radius": 150
+      },
+      "severity": "high",
+      "active": true,
+      "created_date": "2024-01-15",
+      "expiry_date": "2024-06-30",
+      "alerts": {
+        "entry": true,
+        "exit": false,
+        "proximity": 50
+      }
+    },
+    {
+      "id": "zone_002",
+      "name": "Flood Risk Area",
+      "description": "Area prone to flooding during heavy rains",
+      "type": "environmental",
+      "geometry": {
+        "type": "polygon",
+        "coordinates": [
+          [40.7589, -73.9851],
+          [40.7612, -73.9851],
+          [40.7612, -73.9821],
+          [40.7589, -73.9821],
+          [40.7589, -73.9851]
+        ]
+      },
+      "severity": "medium",
+      "active": true,
+      "created_date": "2024-02-01",
+      "weather_dependent": true,
+      "alerts": {
+        "entry": true,
+        "exit": false,
+        "proximity": 25
+      }
+    },
+    {
+      "id": "zone_003",
+      "name": "High Crime Area",
+      "description": "Area with elevated crime statistics",
+      "type": "security",
+      "geometry": {
+        "type": "circle",
+        "center": {
+          "latitude": 40.6782,
+          "longitude": -73.9442
+        },
+        "radius": 200
+      },
+      "severity": "high",
+      "active": true,
+      "time_restrictions": {
+        "active_hours": {
+          "start": "20:00",
+          "end": "06:00"
+        },
+        "days": ["all"]
+      },
+      "alerts": {
+        "entry": true,
+        "exit": true,
+        "proximity": 100
+      }
+    }
+  ],
+  "zone_types": {
+    "construction": {
+      "color": "#FF6B35",
+      "icon": "construction",
+      "default_radius": 100
+    },
+    "environmental": {
+      "color": "#4ECDC4",
+      "icon": "nature",
+      "default_radius": 150
+    },
+    "security": {
+      "color": "#FF4757",
+      "icon": "warning",
+      "default_radius": 200
+    },
+    "traffic": {
+      "color": "#FFA502",
+      "icon": "traffic",
+      "default_radius": 75
+    }
+  },
+  "global_settings": {
+    "auto_activate_zones": true,
+    "check_overlap": true,
+    "merge_overlapping": false,
+    "max_active_zones": 50
+  }
+}
