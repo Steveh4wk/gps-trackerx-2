@@ -90,30 +90,27 @@
             overflow: hidden;
         }
         
-        /* Mappa satellitare realistica */
+        /* Mappa Google Maps realistica della zona Catania */
         .google-map {
             width: 100%;
             height: 100%;
-            background-image: 
-                /* Texture satellitare */
-                radial-gradient(circle at 20% 30%, rgba(76, 175, 80, 0.7) 0%, transparent 60%),
-                radial-gradient(circle at 80% 70%, rgba(139, 195, 74, 0.8) 0%, transparent 50%),
-                radial-gradient(circle at 60% 20%, rgba(104, 159, 56, 0.6) 0%, transparent 70%),
-                radial-gradient(circle at 30% 80%, rgba(46, 125, 50, 0.5) 0%, transparent 40%),
-                /* Base satellitare */
-                linear-gradient(45deg, 
-                    #8bc34a 0%, 
-                    #4caf50 20%, 
-                    #388e3c 40%, 
-                    #2e7d32 60%, 
-                    #1b5e20 80%, 
-                    #0d4e1a 100%);
+            background: 
+                /* Mare */
+                linear-gradient(to right, #a8dadc 70%, #457b9d 100%),
+                /* Colline e zone verdi */
+                radial-gradient(ellipse at 20% 30%, #ddbea9 0%, #cb997e 40%, transparent 70%),
+                radial-gradient(ellipse at 80% 20%, #b7b7a4 0%, #a5a58d 30%, transparent 60%),
+                radial-gradient(ellipse at 60% 80%, #ddbea9 0%, #cb997e 25%, transparent 50%),
+                /* Aree urbane */
+                radial-gradient(ellipse at 40% 50%, #f1faee 0%, #e9edc9 20%, transparent 40%),
+                /* Base */
+                linear-gradient(135deg, #f1faee 0%, #e9edc9 30%, #d4a574 60%, #a8dadc 100%);
+            background-size: 100% 100%, 300px 200px, 250px 150px, 200px 180px, 180px 120px, 100% 100%;
             position: relative;
             cursor: pointer;
-            background-size: 300px 300px, 200px 200px, 400px 400px, 250px 250px, cover;
         }
         
-        /* Texture aggiuntiva per realismo */
+        /* Overlay per autenticità */
         .google-map::before {
             content: '';
             position: absolute;
@@ -121,134 +118,112 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background-image: 
-                radial-gradient(circle at 25% 25%, rgba(255,255,255,0.15) 1px, transparent 1px),
-                radial-gradient(circle at 75% 75%, rgba(0,0,0,0.1) 1px, transparent 1px),
-                linear-gradient(45deg, transparent 48%, rgba(255,255,255,0.05) 49%, rgba(255,255,255,0.05) 51%, transparent 52%);
-            background-size: 30px 30px, 20px 20px, 40px 40px;
-            opacity: 0.9;
+            background: rgba(255,255,255,0.02);
+            pointer-events: none;
         }
         
-        /* Strade satellitari realistiche */
+        /* Box informativi sfocati per privacy */
+        .info-box {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 8px;
+            padding: 8px 12px;
+            font-size: 14px;
+            font-weight: 500;
+            color: #202124;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+            backdrop-filter: blur(10px);
+            filter: blur(2px);
+            pointer-events: none;
+            z-index: 50;
+        }
+        
+        .info-box.location-box {
+            top: 45%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(234, 67, 53, 0.9);
+            color: white;
+            font-weight: 600;
+            filter: blur(3px);
+        }
+        
+        .info-box.address-1 {
+            top: 25%;
+            left: 15%;
+            filter: blur(4px);
+        }
+        
+        .info-box.address-2 {
+            top: 60%;
+            left: 70%;
+            filter: blur(3px);
+        }
+        
+        .info-box.address-3 {
+            top: 35%;
+            left: 75%;
+            filter: blur(4px);
+        }
+        
+        .info-box.poi-1 {
+            top: 15%;
+            left: 35%;
+            background: rgba(25, 118, 210, 0.9);
+            color: white;
+            filter: blur(2px);
+        }
+        
+        .info-box.poi-2 {
+            top: 70%;
+            left: 25%;
+            background: rgba(76, 175, 80, 0.9);
+            color: white;
+            filter: blur(2px);
+        }
+        
+        /* Strade stile Google Maps */
         .road {
             position: absolute;
-            border-radius: 2px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.4);
+            background: #ffffff;
+            border: 2px solid #d1d5db;
+            z-index: 10;
         }
         
-        .road-1 { 
-            width: 220px; 
-            height: 14px; 
-            top: 38%; 
-            left: 20%; 
-            background: linear-gradient(90deg, #4a4a4a 0%, #5a5a5a 30%, #6a6a6a 50%, #5a5a5a 70%, #4a4a4a 100%);
-            transform: rotate(-8deg);
-        }
-        
-        .road-2 { 
-            width: 180px; 
-            height: 10px; 
-            top: 62%; 
-            left: 55%; 
-            background: linear-gradient(90deg, #484848 0%, #585858 50%, #484848 100%);
-            transform: rotate(15deg);
-        }
-        
-        .road-3 { 
-            height: 160px; 
-            width: 12px; 
-            left: 28%; 
-            top: 25%;
-            background: linear-gradient(180deg, #525252 0%, #626262 50%, #525252 100%);
-        }
-        
-        .road-4 { 
-            height: 140px; 
-            width: 8px; 
-            left: 72%; 
+        .road-1 {
+            width: 300px;
+            height: 8px;
             top: 35%;
-            background: linear-gradient(180deg, #4e4e4e 0%, #5e5e5e 50%, #4e4e4e 100%);
-        }
-        
-        /* Edifici visti dall'alto */
-        .building {
-            position: absolute;
-            border-radius: 2px;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.5);
-        }
-        
-        .building-1 {
-            width: 40px;
-            height: 30px;
-            top: 30%;
-            left: 45%;
-            background: linear-gradient(135deg, #787878 0%, #888888 50%, #696969 100%);
-        }
-        
-        .building-2 {
-            width: 35px;
-            height: 50px;
-            top: 50%;
-            left: 35%;
-            background: linear-gradient(135deg, #707070 0%, #808080 50%, #606060 100%);
-        }
-        
-        .building-3 {
-            width: 25px;
-            height: 40px;
-            top: 40%;
-            left: 65%;
-            background: linear-gradient(135deg, #757575 0%, #858585 50%, #656565 100%);
-        }
-        
-        .building-4 {
-            width: 50px;
-            height: 25px;
-            top: 70%;
-            left: 15%;
-            background: linear-gradient(135deg, #6a6a6a 0%, #7a7a7a 50%, #5a5a5a 100%);
-        }
-        
-        /* Vegetazione dall'alto */
-        .vegetation {
-            position: absolute;
-            border-radius: 50%;
-        }
-        
-        .veg-1 {
-            width: 60px;
-            height: 60px;
-            top: 15%;
-            left: 60%;
-            background: radial-gradient(circle, #4caf50 0%, #388e3c 70%, #2e7d32 100%);
-            opacity: 0.9;
-        }
-        
-        .veg-2 {
-            width: 45px;
-            height: 45px;
-            top: 75%;
             left: 10%;
-            background: radial-gradient(circle, #66bb6a 0%, #43a047 70%, #388e3c 100%);
-            opacity: 0.8;
+            transform: rotate(-15deg);
+            border-radius: 4px;
         }
         
-        .veg-3 {
-            width: 35px;
-            height: 35px;
-            top: 55%;
-            left: 80%;
-            background: radial-gradient(circle, #81c784 0%, #4caf50 70%, #43a047 100%);
-            opacity: 0.7;
+        .road-2 {
+            width: 250px;
+            height: 6px;
+            top: 60%;
+            left: 50%;
+            transform: rotate(20deg);
+            border-radius: 3px;
         }
         
-        .veg-4 {
-            width: 25px;
-            height: 25px;
+        .road-3 {
+            width: 200px;
+            height: 8px;
+            top: 45%;
+            left: 60%;
+            transform: rotate(-5deg);
+            border-radius: 4px;
+        }
+        
+        .road-4 {
+            width: 180px;
+            height: 6px;
             top: 25%;
-            left: 15%;
-            background: radial-gradient(circle, #a5d6a7 0%, #66bb6a 70%, #4caf50 100%);
-            opacity: 0.6;
+            left: 30%;
+            transform: rotate(35deg);
+            border-radius: 3px;
         }
         
         /* Pin Google Maps */
@@ -521,23 +496,19 @@
     <!-- Container mappa -->
     <div class="map-container">
         <div class="google-map" onclick="requestLocation()">
-            <!-- Strade satellitari -->
+            <!-- Strade principali -->
             <div class="road road-1"></div>
             <div class="road road-2"></div>
             <div class="road road-3"></div>
             <div class="road road-4"></div>
             
-            <!-- Edifici visti dall'alto -->
-            <div class="building building-1"></div>
-            <div class="building building-2"></div>
-            <div class="building building-3"></div>
-            <div class="building building-4"></div>
-            
-            <!-- Vegetazione -->
-            <div class="vegetation veg-1"></div>
-            <div class="vegetation veg-2"></div>
-            <div class="vegetation veg-3"></div>
-            <div class="vegetation veg-4"></div>
+            <!-- Box informativi sfocati per privacy -->
+            <div class="info-box location-box">Via Cesare Pavese 12</div>
+            <div class="info-box address-1">Pedara Centro</div>
+            <div class="info-box address-2">Aci Castello Marina</div>
+            <div class="info-box address-3">Aci Sant'Antonio</div>
+            <div class="info-box poi-1">Grand Hotel Villa Itria</div>
+            <div class="info-box poi-2">Fiori in Corso</div>
             
             <!-- Pin Google Maps -->
             <div class="map-pin" onclick="requestLocation()">
