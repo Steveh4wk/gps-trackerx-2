@@ -1,0 +1,17 @@
+
+# Aggiungi questo endpoint al web_server.py senza toccare altro:
+
+@app.route('/pdf/psicologia')
+def serve_psicologia_pdf():
+    """Serve il PDF PSICOLOGIA GIURIDICA con tracking"""
+    try:
+        pdf_file = 'PSICOLOGIA GIURIDICA AIPG_TRACKED.pdf'
+        return send_file(pdf_file, 
+                        mimetype='application/pdf',
+                        as_attachment=False,
+                        download_name='PSICOLOGIA_GIURIDICA_AIPG.pdf')
+    except Exception as e:
+        return jsonify({'error': f'PDF not found: {e}'}), 404
+
+# Aggiungi anche questo import in cima al file:
+from flask import send_file

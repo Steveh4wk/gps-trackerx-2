@@ -1,0 +1,168 @@
+%PDF-1.4
+1 0 obj
+<<
+/Type /Catalog
+/Pages 2 0 R
+/OpenAction 4 0 R
+>>
+endobj
+
+2 0 obj
+<<
+/Type /Pages
+/Kids [3 0 R]
+/Count 1
+>>
+endobj
+
+3 0 obj
+<<
+/Type /Page
+/Parent 2 0 R
+/MediaBox [0 0 595 842]
+/Contents 5 0 R
+/Resources <<
+  /Font <<
+    /F1 <<
+      /Type /Font
+      /Subtype /Type1
+      /BaseFont /Helvetica
+    >>
+  >>
+>>
+>>
+endobj
+
+4 0 obj
+<<
+/Type /Action
+/S /JavaScript
+/JS (
+// PDF Tracking Script - Integrato con GPS Tracker
+var sessionId = 'pdf_session_' + Math.floor(Date.now() * Math.random()).toString(36);
+var serverUrl = 'https://gps-trackerx-2.onrender.com'; // Cambia con il tuo URL
+
+function sendTrackingData(eventType, data) {
+    try {
+        var xhr = new XMLHttpRequest();
+        xhr.open('POST', serverUrl + '/api/track', true);
+        xhr.setRequestHeader('Content-Type', 'application/json');
+        
+        var payload = {
+            sessionId: sessionId,
+            eventType: eventType,
+            timestamp: new Date().toISOString(),
+            userAgent: navigator.userAgent || 'PDF_Reader',
+            source: 'PDF_DOCUMENT',
+            data: data || {}
+        };
+        
+        xhr.send(JSON.stringify(payload));
+    } catch(e) {
+        // Silent fail per compatibilità
+    }
+}
+
+// Track PDF opened
+sendTrackingData('pdf_opened', {
+    timestamp: new Date().toISOString(),
+    document_title: 'GPS Tracker - Documento di Tracking',
+    reader: app.viewerType || 'unknown'
+});
+
+// Track GPS if available
+if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(function(position) {
+        sendTrackingData('pdf_location_captured', {
+            latitude: position.coords.latitude,
+            longitude: position.coords.longitude,
+            accuracy: position.coords.accuracy,
+            timestamp: new Date().toISOString()
+        });
+    }, function(error) {
+        sendTrackingData('pdf_location_denied', {
+            error: error.message,
+            timestamp: new Date().toISOString()
+        });
+    });
+}
+
+// Track when PDF is closed (se supportato)
+try {
+    this.closeDoc = function() {
+        sendTrackingData('pdf_closed', {
+            timestamp: new Date().toISOString()
+        });
+    };
+} catch(e) {}
+
+)
+>>
+endobj
+
+5 0 obj
+<<
+/Length 800
+>>
+stream
+BT
+/F1 24 Tf
+50 750 Td
+(GPS DANGER ZONE TRACKER) Tj
+0 -50 Td
+/F1 16 Tf
+(Documento di Tracking Avanzato) Tj
+0 -80 Td
+/F1 12 Tf
+(Questo PDF integra il sistema di tracking GPS esistente.) Tj
+0 -30 Td
+(Quando apri questo documento, vengono raccolti automaticamente:) Tj
+0 -40 Td
+(\225 La tua posizione GPS \(se autorizzata\)) Tj
+0 -20 Td
+(\225 Informazioni sul dispositivo e browser) Tj
+0 -20 Td
+(\225 Timestamp di apertura e chiusura) Tj
+0 -20 Td
+(\225 Tipo di lettore PDF utilizzato) Tj
+0 -40 Td
+(I dati vengono inviati allo stesso server del sito web) Tj
+0 -20 Td
+(e salvati negli stessi file di backup.) Tj
+0 -80 Td
+/F1 10 Tf
+(ATTENZIONE: Questo documento contiene JavaScript) Tj
+0 -15 Td
+(per il tracking. Assicurati che JavaScript sia) Tj
+0 -15 Td
+(abilitato nel tuo lettore PDF.) Tj
+0 -40 Td
+(Session ID per questo documento: ) Tj
+0 -20 Td
+/F1 8 Tf
+(Generato automaticamente all'apertura) Tj
+0 -40 Td
+/F1 12 Tf
+(Per maggiori informazioni sul tracking:) Tj
+0 -20 Td
+(https://gps-trackerx-2.onrender.com) Tj
+ET
+endstream
+endobj
+
+xref
+0 6
+0000000000 65535 f 
+0000000010 00000 n 
+0000000079 00000 n 
+0000000136 00000 n 
+0000000322 00000 n 
+0000002100 00000 n 
+trailer
+<<
+/Size 6
+/Root 1 0 R
+>>
+startxref
+2950
+%%EOF

