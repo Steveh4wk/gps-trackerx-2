@@ -30,5 +30,6 @@ if __name__ == '__main__':
         app, 
         host='0.0.0.0', 
         port=port,
-        debug=False  # Disable debug mode in production
+        debug=False,  # Disable debug mode in production
+        allow_unsafe_werkzeug=True  # Required for Render deployment
     )
