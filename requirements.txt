@@ -1,3 +1,7 @@
+# Build tools (required for Render)
+setuptools>=65.0.0
+wheel>=0.37.0
+
 # GPS and Location Libraries
 gpxpy==1.5.0
 geopy==2.4.0

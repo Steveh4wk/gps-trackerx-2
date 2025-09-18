@@ -1,9 +1,9 @@
 services:
   - type: web
-    name: gps-danger-zone-tracker
+    name: gps-trackerx-2
     env: python
     plan: free
-    buildCommand: pip install -r requirements.txt
+    buildCommand: pip install --upgrade pip setuptools wheel && pip install -r requirements.txt
     startCommand: python start.py
     envVars:
       - key: PYTHON_VERSION
