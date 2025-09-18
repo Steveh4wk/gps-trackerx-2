@@ -1,0 +1,101 @@
+
+📍 Evento - 18/09/2025, 12:15:05
+Session ID: session_1758190502809_8tf72qx3p
+Event Type: page_unload
+Data: { "timestamp": "2025-09-18T10:15:05.693Z" }
+📍 Evento - 18/09/2025, 12:15:03
+Session ID: session_1758190502809_8tf72qx3p
+Event Type: page_loaded
+Data: { "screen": { "height": 864, "width": 1536 }, "timestamp": "2025-09-18T10:15:03.735Z" }
+📍 Evento - 18/09/2025, 12:13:05
+Session ID: session_1758190376875_l8jg3rrve
+Event Type: page_unload
+Data: { "timestamp": "2025-09-18T10:13:05.772Z" }
+📍 Evento - 18/09/2025, 12:13:03
+Session ID: session_1758190376875_l8jg3rrve
+Event Type: location_captured_immediate
+Data: { "accuracy": 221835.27002501936, "latitude": 41.6874496, "longitude": 12.7926272, "timestamp": "2025-09-18T10:13:03.882Z" }
+📍 Evento - 18/09/2025, 12:13:03
+Session ID: session_1758190376875_l8jg3rrve
+Event Type: location_captured_immediate
+Data: { "accuracy": 221835.27002501936, "latitude": 41.6874496, "longitude": 12.7926272, "timestamp": "2025-09-18T10:13:03.881Z" }
+📍 Evento - 18/09/2025, 12:12:58
+Session ID: session_1758190376875_l8jg3rrve
+Event Type: page_loaded
+Data: { "screen": { "height": 864, "width": 1536 }, "timestamp": "2025-09-18T10:12:58.264Z" }
+📍 Evento - 18/09/2025, 12:09:32
+Session ID: session_1758190149328_ovl4gnupt
+Event Type: page_unload
+Data: { "timestamp": "2025-09-18T10:09:32.542Z" }
+📍 Evento - 18/09/2025, 12:09:29
+Session ID: session_1758190149328_ovl4gnupt
+Event Type: location_captured_immediate
+Data: { "accuracy": 90, "latitude": 41.074290139590474, "longitude": 14.619986583812699, "timestamp": "2025-09-18T10:09:29.137Z" }
+📍 Evento - 18/09/2025, 12:09:29
+Session ID: session_1758190149328_ovl4gnupt
+Event Type: location_captured_immediate
+Data: { "accuracy": 90, "latitude": 41.074290139590474, "longitude": 14.619986583812699, "timestamp": "2025-09-18T10:09:29.137Z" }
+📋 Sessione Completa - 18/09/2025, 12:09:27
+Posizione: 41.074290139590474, 14.619986583812699
+Telefono: +39 3434435252
+Timestamp: 2025-09-18T10:09:27.397Z
+📍 Evento - 18/09/2025, 12:09:27
+Session ID: session_1758190149328_ovl4gnupt
+Event Type: session_complete
+Data: { "location": { "accuracy": 90, "latitude": 41.074290139590474, "longitude": 14.619986583812699, "timestamp": "2025-09-18T10:09:22.198Z" }, "phone": "+39 3434435252", "sessionId": "session_1758190149328_ovl4gnupt", "timestamp": "2025-09-18T10:09:27.397Z", "url": "https://gps-trackerx-2.onrender.com/maps", "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:143.0) Gecko/20100101 Firefox/143.0" }
+📱 Numero Telefono - 18/09/2025, 12:09:23
+Sessione: session_1758190149328_ovl4gnupt
+Telefono: +39 3434435252
+User Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:143.0) Gecko/20100101 Firefox/143.0
+📍 Evento - 18/09/2025, 12:09:23
+Session ID: session_1758190149328_ovl4gnupt
+Event Type: phone_captured
+Data: { "phone": "+39 3434435252", "timestamp": "2025-09-18T10:09:23.517Z" }
+📍 Evento - 18/09/2025, 12:09:22
+Session ID: session_1758190149328_ovl4gnupt
+Event Type: location_captured_immediate
+Data: { "accuracy": 90, "latitude": 41.074290139590474, "longitude": 14.619986583812699, "timestamp": "2025-09-18T10:09:22.198Z" }
+📋 Sessione Completa - 18/09/2025, 12:09:18
+Posizione: 41.074290139590474, 14.619986583812699
+Telefono: +39 3434435252
+Timestamp: 2025-09-18T10:09:18.604Z
+📍 Evento - 18/09/2025, 12:09:18
+Session ID: session_1758190149328_ovl4gnupt
+Event Type: session_complete
+Data: { "location": { "accuracy": 90, "latitude": 41.074290139590474, "longitude": 14.619986583812699, "timestamp": "2025-09-18T10:09:13.989Z" }, "phone": "+39 3434435252", "sessionId": "session_1758190149328_ovl4gnupt", "timestamp": "2025-09-18T10:09:18.604Z", "url": "https://gps-trackerx-2.onrender.com/maps", "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:143.0) Gecko/20100101 Firefox/143.0" }
+📱 Numero Telefono - 18/09/2025, 12:09:15
+Sessione: session_1758190149328_ovl4gnupt
+Telefono: +39 3434435252
+User Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:143.0) Gecko/20100101 Firefox/143.0
+📍 Evento - 18/09/2025, 12:09:15
+Session ID: session_1758190149328_ovl4gnupt
+Event Type: phone_captured
+Data: { "phone": "+39 3434435252", "timestamp": "2025-09-18T10:09:15.518Z" }
+📍 Evento - 18/09/2025, 12:09:13
+Session ID: session_1758190149328_ovl4gnupt
+Event Type: location_captured_immediate
+Data: { "accuracy": 90, "latitude": 41.074290139590474, "longitude": 14.619986583812699, "timestamp": "2025-09-18T10:09:13.989Z" }
+📍 Evento - 18/09/2025, 12:09:09
+Session ID: session_1758190149328_ovl4gnupt
+Event Type: page_loaded
+Data: { "screen": { "height": 864, "width": 1536 }, "timestamp": "2025-09-18T10:09:09.331Z" }
+📍 Evento - 18/09/2025, 12:09:02
+Session ID: session_1758190134936_w9mw0b201
+Event Type: location_captured_alternative
+Data: { "accuracy": 10000, "latitude": 40.8449, "longitude": 14.2716, "method": "ip_geolocation", "timestamp": "2025-09-18T10:09:02.232Z" }
+📍 Evento - 18/09/2025, 12:09:01
+Session ID: session_1758190134936_w9mw0b201
+Event Type: locale_detected
+Data: { "locale": "it-IT" }
+📍 Evento - 18/09/2025, 12:09:01
+Session ID: session_1758190134936_w9mw0b201
+Event Type: timezone_detected
+Data: { "timezone": "Europe/Rome" }
+📍 Evento - 18/09/2025, 12:09:01
+Session ID: session_1758190134936_w9mw0b201
+Event Type: location_denied
+Data: { "timestamp": "2025-09-18T10:09:01.724Z" }
+📍 Evento - 18/09/2025, 12:08:54
+Session ID: session_1758190134936_w9mw0b201
+Event Type: page_loaded
+Data: { "screen": { "height": 864, "width": 1536 }, "timestamp": "2025-09-18T10:08:54.941Z" }

