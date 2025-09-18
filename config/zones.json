@@ -8,10 +8,10 @@
       "geometry": {
         "type": "circle",
         "center": {
-          "latitude": 40.7128,
-          "longitude": -74.0060
+          "latitude": 41.9028,
+          "longitude": 12.4964
         },
-        "radius": 150
+        "radius": 200
       },
       "severity": "high",
       "active": true,

