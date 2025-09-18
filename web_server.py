@@ -284,5 +284,11 @@ if __name__ == '__main__':
     start_background_simulation()
     
     # Run the web server
-    is_production = os.environ.get('RENDER')
-    socketio.run(app, debug=not is_production, host='0.0.0.0', port=port)
+    is_production = os.environ.get('RENDER') or os.environ.get('PORT')
+    socketio.run(
+        app, 
+        debug=not is_production, 
+        host='0.0.0.0', 
+        port=port,
+        allow_unsafe_werkzeug=True  # Required for Render deployment
+    )

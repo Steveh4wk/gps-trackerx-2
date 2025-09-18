@@ -8,4 +8,6 @@ services:
     envVars:
       - key: PYTHON_VERSION
         value: 3.9
+      - key: RENDER
+        value: true
     healthCheckPath: /api/status
