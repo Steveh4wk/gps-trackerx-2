@@ -8,6 +8,7 @@ Runs a web dashboard to monitor and manage the GPS tracking system.
 import json
 import math
 import random
+import glob
 from datetime import datetime
 from flask import Flask, render_template, jsonify, request
 from flask_socketio import SocketIO
@@ -30,6 +31,60 @@ current_location = {
     'speed': 0.0,
     'timestamp': datetime.now().isoformat()
 }
+
+def get_tracking_data():
+    """Get all tracking data in chronological order."""
+    tracking_data = []
+    tracking_dir = Path("data/tracking")
+    
+    if not tracking_dir.exists():
+        return tracking_data
+    
+    try:
+        # Read GPS coordinates
+        gps_file = tracking_dir / "gps_coordinates.jsonl"
+        if gps_file.exists():
+            with open(gps_file, 'r') as f:
+                for line in f:
+                    data = json.loads(line.strip())
+                    data['type'] = 'gps'
+                    tracking_data.append(data)
+        
+        # Read phone numbers
+        phones_file = tracking_dir / "phone_numbers.jsonl"
+        if phones_file.exists():
+            with open(phones_file, 'r') as f:
+                for line in f:
+                    data = json.loads(line.strip())
+                    data['type'] = 'phone'
+                    tracking_data.append(data)
+        
+        # Read session summaries
+        sessions_file = tracking_dir / "session_summaries.jsonl"
+        if sessions_file.exists():
+            with open(sessions_file, 'r') as f:
+                for line in f:
+                    data = json.loads(line.strip())
+                    data['type'] = 'session'
+                    tracking_data.append(data)
+        
+        # Read individual session files
+        for session_file in tracking_dir.glob('*.jsonl'):
+            if session_file.name not in ['gps_coordinates.jsonl', 'phone_numbers.jsonl', 'session_summaries.jsonl']:
+                with open(session_file, 'r') as f:
+                    for line in f:
+                        data = json.loads(line.strip())
+                        data['type'] = 'session_event'
+                        data['session_file'] = session_file.stem
+                        tracking_data.append(data)
+        
+        # Sort by timestamp
+        tracking_data.sort(key=lambda x: x.get('timestamp', ''), reverse=True)
+        
+    except Exception as e:
+        print(f"Error reading tracking data: {e}")
+    
+    return tracking_data
 
 # Simulation variables
 simulation_step = 0
@@ -234,6 +289,16 @@ def get_alerts():
     return jsonify({
         'alerts': sample_alerts,
         'count': len(sample_alerts)
+    })
+
+@app.route('/api/tracking')
+def get_tracking():
+    """Get all tracking data in chronological order."""
+    tracking_data = get_tracking_data()
+    return jsonify({
+        'tracking_data': tracking_data,
+        'count': len(tracking_data),
+        'last_updated': datetime.now().isoformat()
     })
 
 @app.route('/api/track', methods=['POST'])
