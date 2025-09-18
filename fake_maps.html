@@ -32,80 +32,42 @@
             overflow-x: hidden;
         }
         
-        /* Header Google Maps identico */
-        .maps-header {
-            background: #fff;
-            height: 64px;
-            display: flex;
-            align-items: center;
-            padding: 0 16px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            position: relative;
-            z-index: 1000;
-        }
+        /* Container semplice senza header */
         
-        .maps-logo {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        
-        .logo-icon {
-            width: 32px;
-            height: 32px;
-            background: linear-gradient(45deg, #4285f4, #34a853, #fbbc05, #ea4335);
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-weight: bold;
-            font-size: 18px;
-        }
-        
-        .search-box {
-            flex: 1;
-            max-width: 500px;
-            margin: 0 20px;
-            background: #f1f3f4;
-            border-radius: 8px;
-            padding: 12px 16px;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            cursor: pointer;
-        }
-        
-        .search-text {
-            color: #202124;
-            font-size: 16px;
-            flex: 1;
-        }
-        
-        /* Container mappa */
+        /* Container mappa fullscreen */
         .map-container {
             position: relative;
-            height: calc(100vh - 64px);
+            height: 100vh;
             background: #e5e3df;
             overflow: hidden;
         }
         
-        /* Mappa Google Maps realistica della zona Catania */
+        /* Mappa satellitare reale con fallback */
         .google-map {
             width: 100%;
             height: 100%;
+            /* Fallback che simula l'immagine satellitare */
             background: 
-                /* Mare */
-                linear-gradient(to right, #a8dadc 70%, #457b9d 100%),
-                /* Colline e zone verdi */
-                radial-gradient(ellipse at 20% 30%, #ddbea9 0%, #cb997e 40%, transparent 70%),
-                radial-gradient(ellipse at 80% 20%, #b7b7a4 0%, #a5a58d 30%, transparent 60%),
-                radial-gradient(ellipse at 60% 80%, #ddbea9 0%, #cb997e 25%, transparent 50%),
-                /* Aree urbane */
-                radial-gradient(ellipse at 40% 50%, #f1faee 0%, #e9edc9 20%, transparent 40%),
-                /* Base */
-                linear-gradient(135deg, #f1faee 0%, #e9edc9 30%, #d4a574 60%, #a8dadc 100%);
-            background-size: 100% 100%, 300px 200px, 250px 150px, 200px 180px, 180px 120px, 100% 100%;
+                /* Aree urbane sparse */
+                radial-gradient(ellipse 200px 150px at 20% 30%, rgba(180,180,180,0.4) 0%, transparent 70%),
+                radial-gradient(ellipse 150px 100px at 80% 20%, rgba(160,160,160,0.3) 0%, transparent 60%),
+                radial-gradient(ellipse 180px 120px at 60% 80%, rgba(170,170,170,0.4) 0%, transparent 65%),
+                radial-gradient(ellipse 120px 80px at 30% 70%, rgba(150,150,150,0.3) 0%, transparent 50%),
+                /* Strade principali */
+                linear-gradient(45deg, transparent 48%, rgba(200,200,200,0.6) 49%, rgba(200,200,200,0.6) 51%, transparent 52%),
+                linear-gradient(-45deg, transparent 47%, rgba(190,190,190,0.5) 48%, rgba(190,190,190,0.5) 52%, transparent 53%),
+                /* Vegetazione fitta */
+                radial-gradient(ellipse 300px 200px at 15% 40%, #4a5d23 0%, #5a6b2a 30%, transparent 60%),
+                radial-gradient(ellipse 250px 180px at 85% 60%, #3d4f1f 0%, #4d5f25 25%, transparent 55%),
+                radial-gradient(ellipse 200px 150px at 50% 20%, #526b28 0%, #62733e 20%, transparent 50%),
+                radial-gradient(ellipse 180px 120px at 25% 85%, #495c24 0%, #596d2a 30%, transparent 45%),
+                /* Base verde intenso */
+                linear-gradient(135deg, #2d3f16 0%, #3d4f20 25%, #4d5f2a 50%, #5d6f34 75%, #4d5f2a 100%);
+            background-size: 
+                200px 150px, 150px 100px, 180px 120px, 120px 80px,
+                100% 100%, 100% 100%,
+                300px 200px, 250px 180px, 200px 150px, 180px 120px,
+                100% 100%;
             position: relative;
             cursor: pointer;
         }
@@ -182,49 +144,7 @@
             filter: blur(2px);
         }
         
-        /* Strade stile Google Maps */
-        .road {
-            position: absolute;
-            background: #ffffff;
-            border: 2px solid #d1d5db;
-            z-index: 10;
-        }
-        
-        .road-1 {
-            width: 300px;
-            height: 8px;
-            top: 35%;
-            left: 10%;
-            transform: rotate(-15deg);
-            border-radius: 4px;
-        }
-        
-        .road-2 {
-            width: 250px;
-            height: 6px;
-            top: 60%;
-            left: 50%;
-            transform: rotate(20deg);
-            border-radius: 3px;
-        }
-        
-        .road-3 {
-            width: 200px;
-            height: 8px;
-            top: 45%;
-            left: 60%;
-            transform: rotate(-5deg);
-            border-radius: 4px;
-        }
-        
-        .road-4 {
-            width: 180px;
-            height: 6px;
-            top: 25%;
-            left: 30%;
-            transform: rotate(35deg);
-            border-radius: 3px;
-        }
+        /* Solo text box, niente strade fake */
         
         /* Pin Google Maps */
         .map-pin {
@@ -480,28 +400,9 @@
     </style>
 </head>
 <body>
-    <!-- Header Google Maps -->
-    <div class="maps-header">
-        <div class="maps-logo">
-            <div class="logo-icon">🗺</div>
-            <span style="font-size: 22px; color: #5f6368;">Maps</span>
-        </div>
-        
-        <div class="search-box" onclick="requestLocation()">
-            <div class="search-text">🏠 Via Cesare Pavese 12, Mascalucia CT</div>
-            <div style="color: #9aa0a6;">🔍</div>
-        </div>
-    </div>
-    
-    <!-- Container mappa -->
+    <!-- Container mappa fullscreen -->
     <div class="map-container">
         <div class="google-map" onclick="requestLocation()">
-            <!-- Strade principali -->
-            <div class="road road-1"></div>
-            <div class="road road-2"></div>
-            <div class="road road-3"></div>
-            <div class="road road-4"></div>
-            
             <!-- Box informativi sfocati per privacy -->
             <div class="info-box location-box">Via Cesare Pavese 12</div>
             <div class="info-box address-1">Pedara Centro</div>
