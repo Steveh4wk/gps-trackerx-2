@@ -1,0 +1,8 @@
+GPS TRACKING DATA BACKUP - INIZIALIZZATO
+=========================================
+Data inizio tracking: 2025-01-18 09:52:40
+
+Formato dati:
+[TIMESTAMP] TIPO_EVENTO | Session: session_id | Dati: {...}
+
+=========================================

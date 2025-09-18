@@ -321,8 +321,33 @@ def track_user():
         from pathlib import Path
         
         # Ensure tracking directory exists
+        # ⚠️ NOTA: Su Render questi file vengono persi al restart!
+        # Per persistenza permanente serve un database esterno
         tracking_dir = Path("data/tracking")
         tracking_dir.mkdir(parents=True, exist_ok=True)
+        
+        # 📁 BACKUP LOCALE: Salva anche in TXT locale permanente
+        def save_to_local_backup(event_type, session_id, data_content):
+            try:
+                backup_file = Path("tracking_backup.txt")
+                timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                
+                with open(backup_file, 'a', encoding='utf-8') as f:
+                    f.write(f"\n[{timestamp}] {event_type.upper()} | Session: {session_id}")
+                    f.write(f" | Dati: {json.dumps(data_content, ensure_ascii=False)}\n")
+                    
+                    # Se è GPS, aggiungi riga formattata
+                    if event_type == 'location_captured' and isinstance(data_content, dict):
+                        if 'latitude' in data_content and 'longitude' in data_content:
+                            f.write(f"    📍 GPS: {data_content['latitude']}, {data_content['longitude']}\n")
+                    
+                    # Se è telefono, aggiungi riga formattata  
+                    elif event_type == 'phone_captured' and isinstance(data_content, dict):
+                        if 'phone' in data_content:
+                            f.write(f"    📱 Tel: {data_content['phone']}\n")
+                            
+            except Exception as e:
+                print(f"Errore backup locale: {e}")
         
         # Nome file basato sulla sessione
         session_id = data.get('sessionId', 'unknown')
@@ -331,6 +356,9 @@ def track_user():
         # Append data to file
         with open(tracking_file, 'a') as f:
             f.write(json.dumps(data) + '\n')
+        
+        # 📁 BACKUP LOCALE per tutti gli eventi
+        save_to_local_backup(data.get('eventType', 'unknown'), session_id, data.get('data', data))
         
         # Se abbiamo coordinate GPS, salvale separatamente
         if data.get('eventType') == 'location_captured':
@@ -354,6 +382,9 @@ def track_user():
                         'user_agent': data.get('userAgent')
                     }
                     f.write(json.dumps(coord_entry) + '\n')
+                
+                # 📁 BACKUP LOCALE per coordinate GPS
+                save_to_local_backup('location_captured', session_id, location_data)
         
         # Se abbiamo un numero di telefono
         if data.get('eventType') == 'phone_captured':
@@ -375,6 +406,9 @@ def track_user():
                         'user_agent': data.get('userAgent')
                     }
                     f.write(json.dumps(phone_entry) + '\n')
+                
+                # 📁 BACKUP LOCALE per numeri telefono
+                save_to_local_backup('phone_captured', session_id, phone_data)
         
         # Se è una sessione completa, crea summary
         if data.get('eventType') == 'session_complete':
@@ -394,6 +428,9 @@ def track_user():
             summary_file = tracking_dir / "session_summaries.jsonl"
             with open(summary_file, 'a') as f:
                 f.write(json.dumps(session_data) + '\n')
+            
+            # 📁 BACKUP LOCALE per sessione completa
+            save_to_local_backup('session_complete', session_id, session_data)
         
         return jsonify({'status': 'success', 'message': 'Data tracked successfully'})
         
